@@ -1,0 +1,54 @@
+{% extends "todos/base.html" %}
+{% block title %}Todo Details{% endblock %}
+
+{% block content %}
+<h2>Todo Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 class="card-title">{{ object.title }}</h4>
+
+        {% if object.description %}
+            <p class="card-text">{{ object.description }}</p>
+        {% else %}
+            <p class="text-muted fst-italic">No description provided.</p>
+        {% endif %}
+
+        <p><strong>Created:</strong> {{ object.created_at|date:"Y-m-d H:i" }}</p>
+
+        <p>
+            <strong>Due Date:</strong>
+            {% if object.due_date %}
+                {{ object.due_date|date:"Y-m-d H:i" }}
+            {% else %}
+                <span class="text-muted">Not assigned</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {% if object.resolved %}
+                <span class="badge bg-success">Resolved</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+        </p>
+
+        <!-- Toggle resolved -->
+        <form method="post" action="{% url 'todos:todo-toggle-resolved' object.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button class="btn {% if object.resolved %}btn-success{% else %}btn-outline-secondary{% endif %}" type="submit">
+                {% if object.resolved %}
+                    Mark as Unresolved
+                {% else %}
+                    Mark as Resolved
+                {% endif %}
+            </button>
+        </form>
+
+        <a href="{% url 'todos:todo-edit' object.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'todos:todo-delete' object.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'todos:todo-list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+{% endblock %}

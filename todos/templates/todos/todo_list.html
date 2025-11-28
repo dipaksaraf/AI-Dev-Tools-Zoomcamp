@@ -1,0 +1,49 @@
+{% extends "todos/base.html" %}
+{% block title %}Your TODOs{% endblock %}
+{% block content %}
+<h1>TODOs</h1>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th><th>Due</th><th>Resolved</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for todo in todos %}
+    <tr class="{% if todo.resolved %}table-success{% endif %}">
+      <td><a href="{{ todo.get_absolute_url }}">{{ todo.title }}</a></td>
+      <td>{% if todo.due_date %}{{ todo.due_date|date:"Y-m-d H:i" }}{% endif %}</td>
+      <td>
+        <form method="post" action="{% url 'todos:todo-toggle-resolved' todo.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button class="btn btn-sm {% if todo.resolved %}btn-success{% else %}btn-outline-secondary{% endif %}" type="submit">
+            {% if todo.resolved %}Resolved{% else %}Mark{% endif %}
+          </button>
+        </form>
+      </td>
+      <td>
+        <a class="btn btn-sm btn-secondary" href="{% url 'todos:todo-edit' todo.pk %}">Edit</a>
+        <a class="btn btn-sm btn-danger" href="{% url 'todos:todo-delete' todo.pk %}">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No todos yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
